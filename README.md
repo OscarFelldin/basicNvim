@@ -1,0 +1,2 @@
+# basicNvim
+Minimal nvim setup
