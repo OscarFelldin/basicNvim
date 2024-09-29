@@ -1,3 +1,81 @@
+--[[
+==============================
+Usage
+==============================
+'n': normal mode
+'v': visual mode
+'i': insert mode
+
+Cheat-sheet (default vim/nvim) ==================
+
+    'n' <C-p> - Spell/variable/function suggestions
+    'n' <C-]> - Go to definition
+    'n' <C-]> - Go to definition
+
+Basic Movement
+    h: Move cursor left
+    j: Move cursor down
+    k: Move cursor up
+    l: Move cursor right
+    w: Move to beginning of next word
+    b: Move to beginning of previous word
+    e: Move to end of word
+    $: Move to end of line
+    0: Move to beginning of line
+    ^: Move to first non-blank character of line
+    gg: Move to first line
+    G: Move to last line
+
+Editing Commands
+    i: Enter Insert mode at cursor position
+    I: Enter Insert mode at beginning of line
+    a: Enter Insert mode after cursor
+    A: Enter Insert mode at end of line
+    o: Insert new line below current line
+    O: Insert new line above current line
+    x: Delete character under cursor
+    dd: Delete entire line
+    D: Delete from cursor to end of line
+    u: Undo last change
+    Ctrl+r: Redo last change
+    dt <character>: Delete to character
+    di <character>: Delete inside characters (di " = "deletes whats inside here")
+    da <character>: Delete around characters (da " = "deletes whats inside here and including quotations")
+    ct <character>: Change to character
+    ci <character>: Change inside characters (ci " = "Changes whats inside here")
+    ca <character>: Change around characters (ca " = "Changes whats inside here and including quotations")
+    *: Highlights word currently on
+    z=: Gives list of spell suggestions for misspelled word under cursor
+
+Visual Mode
+    v: Enter Visual mode (character-wise)
+    V: Enter Visual mode (line-wise)
+    y: Yank (copy) selected text
+    d: Delete selected text
+    c: Change selected text
+
+File Management
+    :e filename: Open file for editing
+    :w: Save current buffer
+    :q: Quit Neovim
+    :wq: Write and quit
+    :x: Write and quit (only if changes were made)
+
+Splits and Tabs
+    :split: Split window horizontally
+    :vsplit: Split window vertically
+    :tabnew: Open new tab
+    gt: Go to next tab
+    gT: Go to previous tab
+
+Search and Replace
+    /: Search forward
+    ?: Search backward
+    n: Next match
+    N: Previous match
+    :%s/old/new/gc: Replace all occurrences of 'old' with 'new'
+--]]
+
 -- ==============================
 -- General Settings
 -- ==============================
@@ -34,6 +112,10 @@ vim.opt.hlsearch = true        -- Highlight search results
 
 -- Wrapping
 vim.opt.wrap = false           -- Disable line wrapping
+
+-- Spelling
+vim.opt.spell = true           -- Enables spelling
+vim.opt.spelllang = 'en_us'    -- Enables spelling
 
 -- Scrolling
 vim.opt.scrolloff = 8          -- Keep 8 lines above/below the cursor when scrolling
@@ -116,6 +198,38 @@ vim.keymap.set('n', '<leader>e', ':CustomLexplore<CR>')
 
 -- Redo
 vim.keymap.set('n', '<S-u>', ':redo<CR>') 
+
+-- Spellcheck
+local spell_lang = {'en_us', 'sv_se', ''}
+
+local function cycle_spell_checking()
+    local current_lang = vim.opt.spelllang:get()
+    local current_index = 0
+    for i, lang in ipairs(spell_lang) do
+        if current_lang == lang then
+            current_index = i
+            break
+        end
+    end
+    
+    local next_index = ((current_index % #spell_lang) + 1)
+    
+    vim.opt.spelllang = spell_lang[next_index]
+    vim.opt.spell = (next_index ~= #spell_lang)
+    
+    local status = ''
+    if next_index == 1 then
+        status = 'English spell checking ON'
+    elseif next_index == 2 then
+        status = 'Swedish spell checking ON'
+    else
+        status = 'Spell checking OFF'
+    end
+    
+    print(status, spell_lang, current_lang, current_index)
+end
+
+vim.keymap.set('n', '<leader>s', cycle_spell_checking, { desc = "Cycle spell checking" })
 
 -- Windows resizing
 vim.keymap.set('n', '<C-k>', ':resize +5<CR>')
