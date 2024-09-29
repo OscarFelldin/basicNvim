@@ -8,7 +8,7 @@ Usage
 
 Cheat-sheet (default vim/nvim) ==================
 
-    'n' <C-p> - Spell/variable/function suggestions
+    'i' <C-p> - Spell/variable/function suggestions
     'n' <C-]> - Go to definition
     'n' <C-]> - Go to definition
 
@@ -26,6 +26,12 @@ Basic Movement
     gg: Move to first line
     G: Move to last line
 
+File jumping
+    'n', <C-]>      " Jump to definition using ctags
+                    " Requires ctags setup:
+                    " 1. In terminal at root of project, run: ctags -R --exclude=.git --exclude=node_modules .
+                    " 2. In Vim, place the cursor on a variable/function and press Ctrl+] in normal mode
+
 Editing Commands
     i: Enter Insert mode at cursor position
     I: Enter Insert mode at beginning of line
@@ -36,6 +42,7 @@ Editing Commands
     x: Delete character under cursor
     dd: Delete entire line
     D: Delete from cursor to end of line
+    C: Change to the end of line
     u: Undo last change
     Ctrl+r: Redo last change
     dt <character>: Delete to character
@@ -74,10 +81,19 @@ Search and Replace
     n: Next match
     N: Previous match
     :%s/old/new/gc: Replace all occurrences of 'old' with 'new'
+
+Windows
+    'n', <C-w>s       " Make new windows (horizontal)
+    'n', <C-w>v       " Make new window (Vertical)
+    'n', <C-w>h       " Make windows to the left active
+    'n', <C-w>j       " Make window below active
+    'n', <C-w>k       " Make windows above active
+    'n', <C-w>l       " Make windows to the right active
+    'n', <C-w>h       " Make windows to the left active
 --]]
 
 -- ==============================
--- General Settings
+-- General Settings - Research any of these with :help <setting>
 -- ==============================
 -- leader key to be space for keymap shortcuts
 vim.g.mapleader = " "
@@ -114,8 +130,8 @@ vim.opt.hlsearch = true        -- Highlight search results
 vim.opt.wrap = false           -- Disable line wrapping
 
 -- Spelling
-vim.opt.spell = true           -- Enables spelling
-vim.opt.spelllang = 'en_us'    -- Enables spelling
+vim.opt.spell = true                    -- Enables spelling
+vim.opt.spelllang = 'en_us,sv_se'       -- Enables spelling
 
 -- Scrolling
 vim.opt.scrolloff = 8          -- Keep 8 lines above/below the cursor when scrolling
@@ -200,36 +216,7 @@ vim.keymap.set('n', '<leader>e', ':CustomLexplore<CR>')
 vim.keymap.set('n', '<S-u>', ':redo<CR>') 
 
 -- Spellcheck
-local spell_lang = {'en_us', 'sv_se', ''}
-
-local function cycle_spell_checking()
-    local current_lang = vim.opt.spelllang:get()
-    local current_index = 0
-    for i, lang in ipairs(spell_lang) do
-        if current_lang == lang then
-            current_index = i
-            break
-        end
-    end
-    
-    local next_index = ((current_index % #spell_lang) + 1)
-    
-    vim.opt.spelllang = spell_lang[next_index]
-    vim.opt.spell = (next_index ~= #spell_lang)
-    
-    local status = ''
-    if next_index == 1 then
-        status = 'English spell checking ON'
-    elseif next_index == 2 then
-        status = 'Swedish spell checking ON'
-    else
-        status = 'Spell checking OFF'
-    end
-    
-    print(status, spell_lang, current_lang, current_index)
-end
-
-vim.keymap.set('n', '<leader>s', cycle_spell_checking, { desc = "Cycle spell checking" })
+vim.keymap.set('n', '<leader>s', ':spell!<CR>') 
 
 -- Windows resizing
 vim.keymap.set('n', '<C-k>', ':resize +5<CR>')
